@@ -14,39 +14,74 @@ namespace MauiApp1.Services
     {
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         
-        private string _baseUrl = "http://172.16.1.6:7270";
+        private string _baseUrl = "http://172.16.1.114:7037";
 
-		private string _basePostResponse = "login succesfully";
-
-		public async Task<LoginResposeModel> Addlogin(AddLoginRequest loginRequest)
+		public async Task<AddLoginRequest> Addlogin(LoginResposeModel loginRequest)
 		{
             //throw new NotImplementedException();
 
-            var returnRespone = new LoginResposeModel();
+            var returnRespone = new AddLoginRequest();
             var text = "Please wait";
 
             try
             {
 				using (var httpClient = new HttpClient())
 				{
-					string url = $"{_baseUrl}/local/logindetails";
-                    url = "";
+                    string responseString = "";
 
-                    var serializeContent = JsonConvert.SerializeObject(loginRequest);
-					var apiResponse = await httpClient
-                        .PostAsync(url, new StringContent(serializeContent,Encoding.UTF8,"application/json"));
-					if (apiResponse.StatusCode == System.Net.HttpStatusCode.OK)
-					{
-						var response = await apiResponse.Content.ReadAsStringAsync();
-                        var  deserilizeResponse =
-                            JsonConvert.DeserializeObject<LoginResposeModel>(response.ToString());
-                        return deserilizeResponse;
+                    string url = $"{_baseUrl}/local/logindetails";
+
+                    //added
+                    HttpResponseMessage response = new();
+                    response.EnsureSuccessStatusCode();
+                    HttpRequestMessage request = new HttpRequestMessage();
+                    string strJSON1 = JsonConvert.SerializeObject(loginRequest);
+                    HttpMethod method = new HttpMethod("POST");
+
+                    if (strJSON1.Length > 0)
+                    {
+                        string ostr = strJSON1.Remove(strJSON1.Length - 1, 1);
+                        ostr = ostr.Remove(0, 1);
+                        strJSON1 = ostr;
+                        //strJSON1 = strJSON1.Replace("jsonurlcatagory", "jsonurl");
+
+                        var content = new StringContent(strJSON1, Encoding.UTF8, "application/json");
+                        var response2 = await httpClient.PostAsync(url, content); //client.PostAsync
+
+
+                        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            responseString = await response2.Content.ReadAsStringAsync();
+
+                            returnRespone.message = responseString;
+
+
+                        }
+                        else
+                        {
+
+                            var ReturnString = "ERROR on fetching report requests. upload failed; " + Environment.NewLine + " response StatusCode is : " + response2.StatusCode.ToString() + Environment.NewLine;
+                            returnRespone.message = ReturnString;
+
+                        }
                     }
-					else
-					{
-						text = "Network Error!";
-					}
-				}
+                    return returnRespone;
+
+                    //var serializeContent = JsonConvert.SerializeObject(loginRequest);
+                    //               var apiResponse = await httpClient
+                    //                   .PostAsync(url, new StringContent(serializeContent,Encoding.UTF8,"application/json"));
+                    //if (apiResponse.StatusCode == System.Net.HttpStatusCode.OK)
+                    //{
+                    //	var respons2e = await apiResponse.Content.ReadAsStringAsync();
+                    //                   var  deserilizeResponse =
+                    //                       JsonConvert.DeserializeObject<LoginResposeModel>(respons2e.ToString());
+                    //                   return deserilizeResponse;
+                    //               }
+                    //else
+                    //{
+                    //	text = "Network Error!";
+                    //}
+                }
 			}
 			catch (Exception ex)
 			{
@@ -81,5 +116,10 @@ namespace MauiApp1.Services
             }
             return returnRespone;
         }
+
+        //Task<LoginResposeModel> ILoginService.Addlogin(AddLoginRequest loginRequest)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

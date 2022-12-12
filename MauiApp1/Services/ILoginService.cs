@@ -11,6 +11,6 @@ namespace MauiApp1.Services
     {
         Task<List<LoginResposeModel>> GetAllLoginList();
 
-        Task<LoginResposeModel> Addlogin(AddLoginRequest loginRequest);
+        Task<AddLoginRequest> Addlogin(LoginResposeModel loginRequest);
     }
 }

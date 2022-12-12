@@ -78,6 +78,7 @@ else
             }
             if(chance){
                 AddUserFun();
+                match = "";
             }
         } else
         {
@@ -88,8 +89,9 @@ else
 
     private async void AddUserFun()
     {
-        var addloginRequest = new AddLoginRequest
+        var addloginRequest = new LoginResposeModel
         {
+            Id = 0,
             userName = nameE,
             password = passwordA
         };
@@ -99,13 +101,13 @@ else
         this.StateHasChanged();
 
 
-        if (response != null)
+        if (response.message == "Login Successfully")
         {
             await App.Current.MainPage.DisplayAlert("Login Added", "ADDED", "OK");
         }
         else
         {
-            await App.Current.MainPage.DisplayAlert("Error", "Login unsuccesfull", "OK");
+            await App.Current.MainPage.DisplayAlert("Error", "Login unsuccesfull" + Environment.NewLine + response.message, "OK");
         }
     }
 }
