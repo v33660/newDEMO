@@ -1,0 +1,63 @@
+﻿@page "/counter"
+@using MauiApp1.Services;
+@using MauiApp1.Models;
+
+@inject ILoginService LoginService;
+
+<h1>Login</h1>
+
+@if (_loginList == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div>
+        <div class="form-group">
+            <label>UserName</label>
+            <input @bind="nameE" class="form-control" placeholder="User Name">
+        </div>
+        <div class="mt-2 form-group">
+            <label>Password</label>
+            <input @bind="passwordE" class="form-control" placeholder="Password">
+        </div>
+
+        <button class="btn btn-primary" @onclick="loginFun">Login</button>
+        <div>
+            <label>@match</label>
+        </div>
+    </div>
+}
+
+@code {
+    private string nameE;
+    private string passwordE;
+    private string match = "";
+
+    //double fontSize = 14;
+    //var toast = Toast.Make(text, ToastDuration.Short, fontSize);
+
+    List<LoginResposeModel> _loginList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loginList = await LoginService.GetAllLoginList();
+    }
+
+    
+    //await toast.Show(cancellationTokenSource.Token);
+
+    private void loginFun(){
+        foreach(var login in _loginList)
+        {
+            var n = login.userName;
+            var p = login.password;
+            if (n == nameE && p == passwordE)
+            {
+                match = "Welcome " + n;
+                break;
+            }
+            else match = "Incorrect username/password";
+        }
+    }
+}
